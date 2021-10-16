@@ -58,6 +58,7 @@ if not path.exists(db_path):
     )""")
 
     conn.commit()
+    conn.close()
 
 # Connect to database
 conn = sqlite3.connect(db_name)
