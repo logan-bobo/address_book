@@ -32,17 +32,25 @@ def create_contact():
 def list_all_contacts():
 
     # Select contact inforamtion to the database
-    data = cursor.execute(f"""
+    contacts = cursor.execute(f"""
         SELECT 
             *
         FROM {contacts_table}
     """).fetchall()
 
-    # Make this output better
-    return data
+    for contact in contacts:
+        print(f"""
+        +---------+
+        | Contact |
+        +---------+
+        First Name: {contact[0]}
+        Seccond Name: {contact[1]}
+        Mobule Number: {contact[2]}
+        Email: {contact[3]}
+        """)
 
-if not path.exists(db_path):
-    # Connect to database
+def create_database():
+        # Connect to database
     conn = sqlite3.connect(db_name)
 
     # Database cusror
@@ -59,6 +67,9 @@ if not path.exists(db_path):
 
     conn.commit()
     conn.close()
+
+if not path.exists(db_path):
+    create_database()
 
 # Connect to database
 conn = sqlite3.connect(db_name)
