@@ -6,7 +6,6 @@ import re
 from os import path
 
 
-
 # Datbase and contacts table
 db_name = 'contacts.db'
 contacts_table = 'contacts'
@@ -22,11 +21,13 @@ def create_contact():
     correct_email = False
     email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
+    # Fix exceptions
     while correct_number is False:
-        mobile_number = phonenumbers.parse(input("what is their mobile number: "))
+        mobile_number = input("what is their mobile number: ")
         if phonenumbers.is_possible_number(mobile_number):
             correct_number = True
 
+    # Fix exceptions
     while correct_email is False:
         email = input("What is their email: ")
         if(re.fullmatch(email_regex, email)):
