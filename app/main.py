@@ -1,7 +1,12 @@
-# Contacts book
-
+#!/usr/bin/env python3
 import sqlite3
+import phonenumbers
+
 from os import path
+from phonenumbers import carrier, timezone, geocoder
+from email_validator import validate_email, EmailNotValidError
+
+
 
 # Datbase and contacts table
 db_name = 'contacts.db'
@@ -12,11 +17,17 @@ def create_contact():
     """
     Take in user data to create a contatc on the database
     """
-    first_name = (input("What is their frist name?: "))
+    first_name = (input("What is their first name?: "))
     last_name = input("What is their last name?: ")
-    # Add error checking and loop so the user can only enter a valid number
-    mobile_number = int(input("what is their mobile number: "))
-    # Add error checking and loop so the user can only enter a valid email address
+    correct_number = False
+    correct_email = False
+
+    while correct_number is False:
+        mobile_number = phonenumbers.parse(input("what is their mobile number: "))
+        if phonenumbers.is_possible_number(mobile_number):
+            correct_number = True
+
+    # add checking on email 
     email = input("What is their email: ")
 
     cursor.execute(f"""
@@ -30,8 +41,9 @@ def create_contact():
     conn.commit()
 
 def list_all_contacts():
-
-    # Select contact inforamtion to the database
+    """
+    lists all contacts in the contact db
+    """
     contacts = cursor.execute(f"""
         SELECT 
             *
@@ -44,16 +56,20 @@ def list_all_contacts():
         | Contact |
         +---------+
         First Name: {contact[0]}
-        Seccond Name: {contact[1]}
-        Mobule Number: {contact[2]}
+        Second Name: {contact[1]}
+        Mobile Number: {contact[2]}
         Email: {contact[3]}
         """)
 
 def create_database():
-        # Connect to database
+    """
+    Creates a database then a main contacts table in that database.
+    """
+
+    # Connect to database
     conn = sqlite3.connect(db_name)
 
-    # Database cusror
+    # Database cursor
     cursor = conn.cursor()
 
     # Create Table
@@ -61,24 +77,16 @@ def create_database():
         CREATE TABLE {contacts_table} (
             first_name TEXT,
             last_name TEXT,
-            mobile_number INTEGER,
+            mobile_number TEXT,
             email TEXT
     )""")
 
     conn.commit()
     conn.close()
 
-if not path.exists(db_path):
-    create_database()
 
-# Connect to database
-conn = sqlite3.connect(db_name)
-
-# Database cusror
-cursor = conn.cursor()
-
-# Main menue text
-menue = ("""
+# Main menu text
+menu = ("""
 +-------------------+------+
 |     Function      | Code |
 +-------------------+------+
@@ -89,30 +97,35 @@ menue = ("""
 | List all contacts |    5 |
 | Quit              |    6 |
 +-------------------+------+
-\n\t Please select a function code :- 
+\n\t Please select a function code : 
 """)
 
-active = True
-while active:
-    option = int(input(menue))
-    if option == 1:
-        create_contact()
-    if option == 2:
-        print("to do")
-    if option == 3:
-        print("to do ")
-    if option == 4:
-        print("to do ")
-    if option == 5:
-        print(list_all_contacts())
+if __name__ == "__main__":
+    active = True
 
+    # Create the main database if it does not exist
+    if not path.exists(db_path):
+        create_database()
 
-# # Update a entry in the database
-# cursor.execute(f"""UPDATE {contacts_table} SET first_name = 'BOB' WHERE contact_id = 1  """)
+    # Connect to database
+    conn = sqlite3.connect(db_name)
 
-# # Commit our changes
-# conn.commit()
+    # Database cusror
+    cursor = conn.cursor()
 
-# # Close con 
-# conn.close()
-
+    while active:
+        option = int(input(menu))
+        if option == 1:
+            create_contact()
+        if option == 2:
+            print("to do")
+        if option == 3:
+            print("to do ")
+        if option == 4:
+            print("to do ")
+        if option == 5:
+            list_all_contacts()
+        if option == 6:
+            conn.commit()
+            conn.close()
+            quit()
