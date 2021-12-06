@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import sqlite3
 import phonenumbers
+import re
 
 from os import path
-from phonenumbers import carrier, timezone, geocoder
-from email_validator import validate_email, EmailNotValidError
 
 
 
@@ -21,14 +20,19 @@ def create_contact():
     last_name = input("What is their last name?: ")
     correct_number = False
     correct_email = False
+    email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
     while correct_number is False:
         mobile_number = phonenumbers.parse(input("what is their mobile number: "))
         if phonenumbers.is_possible_number(mobile_number):
             correct_number = True
 
-    # add checking on email 
-    email = input("What is their email: ")
+    while correct_email is False:
+        email = input("What is their email: ")
+        if(re.fullmatch(email_regex, email)):
+            correct_email = True
+        else:
+            correct_email = False
 
     cursor.execute(f"""
     INSERT INTO {contacts_table} VALUES(
